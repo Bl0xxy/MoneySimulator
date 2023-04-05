@@ -124,7 +124,7 @@ def cmdrun(cmd):  # New Command System
                     "green"))
 
         upgrade = input("\n\n" +
-                        colored("Choose an Upgrade: ", "cyan")).lower()
+                        colored("Choose an Upgrade\n›› ", "cyan")).lower()
         if upgrade.lower() == "multiplier":
             if stats['multiplierprice'] <= stats["moneyamount"]:
                 ShopMultiplier.buy()
@@ -180,7 +180,7 @@ while running:
             f"------Money: {stats['moneyamount']}----Multiplier: x{stats['multiplier']}----",
             "green"))
 
-    command = input(colored("Enter A Command\n>> ", "yellow")).lower()
+    command = input(colored("Enter A Command\n›› ", "yellow")).lower()
 
     if (command in cmds) or command == 'm':
         cmdrun(command.lower())
