@@ -4,23 +4,9 @@ from commands import info, money, quit, restart, save, shop
 from termcolor import colored
 import os
 import json
-
-### SAVE FILE ###
+import time
 
 stats = {}
-
-with open("game_save.json", encoding="utf-8") as file:
-    if not (json.load(file) == "No Save"):
-        with open("game_save.json", encoding="utf-8") as data:
-            stats = json.load(data)
-    else:
-        stats = {
-            "multiplier": 1,
-            "moneyamount": 0,
-            "multiplierpricer": 1,
-            "multiplierprice": 10,
-            "cmd_shorten": False
-        }
 
 ### FUNCTIONS ###
 
@@ -65,31 +51,62 @@ def run_command(command):
 
     # Developer Testing Commands - Disabled in Releases
     #
-    # elif command == "devcheats":
-    #    stats['moneyamount'] += 1000000
+    elif command == "devcheats":
+        stats['moneyamount'] += 1000000
     #
 
 
 ### GAME ###
 
-clr_display()
 
-while True:  # Loop Game
-    if stats["moneyamount"] <= 0:
-        stats['moneyamount'] = 0  # Prevention of Bugs
+def run_game():
+    global stats
+    clr_display()
 
-    # Display
-    print(
-        colored(
-            f"------Money: {int(stats['moneyamount'])}----Multiplier: x{int(stats['multiplier'])}----",
-            "green"))
+    with open("game_save.json", encoding="utf-8") as file:
+        if not (json.load(file) == "No Save"):
+            with open("game_save.json", encoding="utf-8") as data:
+                stats = json.load(data)
+        else:
+            stats = {
+                "multiplier": 1,
+                "moneyamount": 0,
+                "multiplierpricer": 1,
+                "multiplierprice": 10,
+                "cmd_shorten": False,
+                "workers": 0
+            }
 
-    command = input(colored("Enter A Command\n›› ",
-                            "yellow")).lower()  # Get Command From User
+            print(
+                colored('Enter "Help" to Learn How to Play Money Simulator!',
+                        "yellow"))
 
-    run_command(command.lower())  # Run the Given Command
+            time.sleep(2)
 
-    # AutoSave Feature
-    save_game()
+    clr_display()
 
-    clr_display()  # Updates Display
+    while True:  # Loop Game
+
+        # Prevention of Bugs
+        if stats["moneyamount"] <= 0: stats['moneyamount'] = 0
+        if stats["workers"] <= 0: stats["workers"] = 0
+        if stats["workers"] > 5: stats["workers"] = 5
+        if stats["multiplier"] > 2: stats["multiplier"] = 1
+
+        # Display
+        print(
+            colored(
+                f"------Money: {int(stats['moneyamount'])}----Multiplier: x{int(stats['multiplier'])}----Workers: {int(stats['workers'])}----",
+                "green"))
+
+        # User Commands & AutoSave
+        command = input(colored("Enter A Command\n›› ", "yellow")).lower()
+        run_command(command.lower())
+
+        save_game()
+
+        clr_display()
+
+
+if __name__ == "__main__":
+    run_game()
