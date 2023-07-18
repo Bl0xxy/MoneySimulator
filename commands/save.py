@@ -1,12 +1,12 @@
 from termcolor import colored
-import time, json
+import time
+import util
 
 
 def main(data):
     print(colored("Saving Data", 'blue'))
     time.sleep(2)
-    with open('game_save.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f)
+    util.save_game()
 
 
 if __name__ == '__main__':
