@@ -1,4 +1,3 @@
-from termcolor import colored
 from random import randint
 
 def main(stats):

@@ -1,19 +1,13 @@
 from termcolor import colored
+from commands import inventory as inv
 import util
 import time
 
 aliases = [["multiplier", "multiply", "mm", "moneymultiplier", "money multiplier", "multi"], ["supermulti", "supermultiply", "super multi", "supermultiply", "supermultiplier", "super multiplier"], ["cmdshorten", "command shortener", "command shorten", "cmd shorten", "cmd shortener", "commandshortener", "cmdshortener", "cmdshorten", "commandshorten"]]
 
-prices = {"bluegem": 5000, "mystshard": 3000, "iron": 350, "wood": 150}
+prices = {"bluegem": 10000, "mystshard": 5000, "iron": 150, "wood": 75}
 
 names = {"mystshard": "Mysterious Shard", "bluegem": "Blue Gem", "wood": 0, "iron": 0}
-
-def inv_empty(stats): # Check Inventory
-    for item in stats['inventory']:
-        if stats['inventory'][item] != 0:
-            print(stats['inventory'][item])
-            return False
-    return True
 
 def multiplier_pricing(stats):
     global addition
@@ -60,7 +54,6 @@ def buy_item(upgrade, stats):
             util.clr_display()
             print(colored("You can't afford that item!  Come back later!"))
             time.sleep(1)
-            
 
 
 def main(stats):
@@ -87,16 +80,13 @@ def main(stats):
 
         print(colored("-- Inventory --\n", "green"))
 
-        if inv_empty(stats):
+        if inv.inv_empty(stats):
             print("(Empty)", "grey")
             input("\nPress ENTER to Continue... ")
             return
 
         while True:
-            util.clr_display()
-            print(colored("-- Inventory --\n", "green"))
-            for item in stats['inventory']:
-                print(f"{colored(item, 'blue')} | x{colored(stats['inventory'][stats])}")
+            inv.print_inventory(stats)
             sell = input(colored('\nWhat Item Would You Like To Sell?\n›› ', "green"))
 
             if not sell in stats['inventory']:
@@ -109,10 +99,9 @@ def main(stats):
                 continue
 
             while True:
-                util.clr_display()
-                print(colored("-- Inventory --\n", "green"))
+                inv.print_inventory(stats)
                 try:
-                    sell_amt = int(input(colored("How many do you want to sell?\n›› ", "green")))
+                    sell_amt = int(input(colored("\nHow many do you want to sell?\n›› ", "green")))
                     break
                 except ValueError:
                     util.clr_display()
@@ -132,17 +121,20 @@ def main(stats):
             name = ""
 
             if sell_amt > 1 and not (names[sell] == 0):
-                name = names[item]
+                name = names[sell]
             else:
-                name = str(item).capitalize()
+                name = str(sell).capitalize()
 
 
-            stats['moneyamount'] += prices[item] * stats['multiplier']
-            stats[sell] -= sell_amt
+            stats['moneyamount'] += prices[sell] * stats['multiplier']
+            stats['inventory'][sell] -= sell_amt
 
             util.clr_display()
 
-            print(colored(f"You sold {str(int(sell_amt))} {name} for {prices[item]*stats['multiplier']}"))
+            print(colored(f"You sold {str(int(sell_amt))} {name} for {prices[sell]*stats['multiplier']}"))
+
+            time.sleep(1.75)
+            return
 
 
 if __name__ == "__main__":

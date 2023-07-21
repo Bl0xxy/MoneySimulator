@@ -28,7 +28,8 @@ def check_stats(stats):
 
     for item in old_items: # Name Change Check
         if item in stats:
-            stats[old_items[item]] = stats[item] 
+            stats[old_items[item]] = stats[item]
+            stats.__delitem__(item) 
 
     for item in old_items: # Name Change Check (Inventory)
         if item in stats['inventory']:

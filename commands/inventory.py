@@ -33,8 +33,7 @@ def get_item(stats, results):
 
     util.save_game(stats)
 
-def main(stats):
-
+def print_inventory(stats):
     if inv_empty(stats):
         clr_display()
         print(colored("Your Inventory is Empty!", "yellow"))
@@ -48,6 +47,8 @@ def main(stats):
     for item in stats['inventory']:
         print(colored(names[str(item)], "green") + colored(" x" + str(stats['inventory'][item]), "yellow"))
 
+def main(stats):
+    print_inventory(stats)
     time.sleep(0.75)
     input("\nPress ENTER to Continue...")
 

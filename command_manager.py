@@ -34,8 +34,8 @@ def main(command, stats):
 
     # Developer Testing Commands - Disabled in Releases
     #
-    #elif command == "devcheats":
-    #    stats['moneyamount'] += 1000000
+    elif command == "devcheats":
+        stats['moneyamount'] += 1000000
     #
 
 if __name__ == "__main__":
