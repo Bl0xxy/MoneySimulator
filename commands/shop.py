@@ -1,9 +1,19 @@
 from termcolor import colored
-import time, os
-from .inventory import is_empty
+import util
+import time
 
-def clr_display():
-    os.system("cls" if os.name == "nt" else "clear")
+aliases = [["multiplier", "multiply", "mm", "moneymultiplier", "money multiplier", "multi"], ["supermulti", "supermultiply", "super multi", "supermultiply", "supermultiplier", "super multiplier"], ["cmdshorten", "command shortener", "command shorten", "cmd shorten", "cmd shortener", "commandshortener", "cmdshortener", "cmdshorten", "commandshorten"]]
+
+prices = {"bluegem": 5000, "mystshard": 3000, "iron": 350, "wood": 150}
+
+names = {"mystshard": "Mysterious Shard", "bluegem": "Blue Gem", "wood": 0, "iron": 0}
+
+def inv_empty(stats): # Check Inventory
+    for item in stats['inventory']:
+        if stats['inventory'][item] != 0:
+            print(stats['inventory'][item])
+            return False
+    return True
 
 def multiplier_pricing(stats):
     global addition
@@ -18,129 +28,122 @@ def multiplier_pricing(stats):
     elif stats["multiplier"] < 51:
         addition = 100
 
+def buy_item(upgrade, stats):
+    shortener = stats['cmd_shorten']
+    if upgrade in aliases[0] and shortener or upgrade == "multiplier":
+        if stats['moneyamount'] >= stats['multiplierprice']:
+            stats['moneyamount'] -= stats['multiplierprice']
+            stats['multiplier'] += 1
+            multiplier_pricing(stats)
+            stats["multiplierpricer"] += addition
+            stats["multiplierprice"] = int((stats["multiplierpricer"] * stats["multiplierpricer"]) / 2)
+        else:
+            util.clr_display()
+            print(colored("You can't afford that item!  Come back later!"))
+            time.sleep(1)
+    elif ((upgrade in aliases[1] and shortener) or upgrade == "supermultiplier" or upgrade == "super multiplier") and stats['multiplier'] > 14:
+        if stats['moneyamount'] >= stats['multiplierprice'] * 3:
+            stats['moneyamount'] -= stats['multiplierprice'] * 3
+            stats['multiplier'] += 5
+            multiplier_pricing(stats)
+            stats["multiplierpricer"] += addition
+            stats["multiplierprice"] = int((stats["multiplierpricer"] * stats["multiplierpricer"]) / 2)
+        else:
+            util.clr_display()
+            print(colored("You can't afford that item!  Come back later!"))
+            time.sleep(1)
+    elif (shortener and upgrade in aliases[2]) or upgrade == "command shortener" or upgrade == "commandshortener":
+        if stats['moneyamount'] >= 75:
+            stats['moneyamount'] -= 75
+            stats['cmd_shorten'] = True
+        else:
+            util.clr_display()
+            print(colored("You can't afford that item!  Come back later!"))
+            time.sleep(1)
+            
+
 
 def main(stats):
-    ## SHOP SETUP ##
 
-    shopItems = []
+    util.clr_display()
 
+    mode = input(colored("Do you want to buy or sell items?\n›› ", "green")).lower()
 
-    class NoUseShopItem(Exception):
-        pass
-
-
-    class ShopItem:
-        def __init__(self, name, displayName):
-            self.name = name
-            self.displayName = displayName
-            self.action = None
-            shopItems.append(self)
-
-        def buy(self, price, increase_amount):
-            stats["moneyamount"] -= price
-            if increase_amount: stats[self.name] += 1
-
-        def use(self):
-            if self.action != None:
-                self.action()
-            else:
-                raise NoUseShopItem('Item "' + self.name +'" does not have an action assigned to it.')
-
-
-    ShopMultiplier = ShopItem("multiplier", "Money Multiplier")
-    SuperMultiplier = ShopItem("supermultiplier", "Super Multiplier")
-    CommandShortener = ShopItem("cmdshortener", "Command Shortener")
-
-    clr_display()
-    shop_mode = input(colored("Do you want to buy or sell items?\n›› ", "green")).lower()
-
-    if shop_mode == "buy":
-        clr_display()
+    if mode == "buy" or mode == "b":
+        util.clr_display()
         print(colored("*Press ENTER to Leave Shop*\n", "red"))
-        print(colored("Upgrades:\n", "blue"))
+        print(colored("-- Upgrades --\n", "blue"))
         print(colored("Multiplier: $" + str(int(stats["multiplierprice"])), "green"))
-
         if stats['multiplier'] > 14:
             print(colored("Super Multiplier: $" + str(int(stats["multiplierprice"]) * 3), "green"))
 
         print(colored("\nCommand Shortener: $75" if not stats["cmd_shorten"] else "\nCommand Shortener: Bought Already!", "yellow"))
 
-        upgrade = input("\n\n" +
-        colored("Choose an Upgrade\n›› ", "cyan")).lower()
-        if upgrade in ["multiplier", "multiply", "mm", "moneymultiplier", "money multiplier", "multi"]:
-            if upgrade != "multiplier" and not stats["cmd_shorten"]:
-                return
-            if stats['multiplierprice'] <= stats["moneyamount"]:
-                ShopMultiplier.buy(stats["multiplierprice"], True)
-                addition = 8.5
-                multiplier_pricing(stats)
-                stats["multiplierpricer"] += addition
-                stats["multiplierprice"] = int((stats["multiplierpricer"] * stats["multiplierpricer"]) / 2)
-            else:
-                clr_display()
-                print(colored("You can't afford that item!  Come back later!"))
-                time.sleep(1)
-        elif stats["multiplier"] > 14 and (upgrade in ["supermulti", "supermultiply", "super multi", "supermultiply", "supermultiplier", "super multiplier"]):
-            if (upgrade != "super multiplier" and upgrade != "supermultiplier") and not stats["cmd_shorten"]:
-                return
-            if stats['multiplierprice'] <= stats["moneyamount"]:
-                SuperMultiplier.buy(stats["multiplierprice"] * 3, False)
-                stats['multiplier'] += 5
-                addition = 8.5
-                multiplier_pricing(stats)
-                stats["multiplierpricer"] += addition
-                stats["multiplierprice"] = int((stats["multiplierpricer"] * stats["multiplierpricer"]) / 2)
-            else:
-                clr_display()
-                print(colored("You can't afford that item!  Come back later!"))
-                time.sleep(1)
-        elif (not stats["cmd_shorten"]) and (upgrade in ["cmdshorten", "command shortener", "command shorten", "cmd shorten", "cmd shortener", "commandshortener", "cmdshortener", "cmdshorten", "commandshorten"]):
-            if 75 <= stats["moneyamount"]:
-                CommandShortener.buy(75, False)
-                stats["cmd_shorten"] = True
-            else:
-                clr_display()
-                print(colored("You can't afford that item!  Come back later!"))
-                time.sleep(1)
-    elif shop_mode == "sell" or shop_mode == "sel":
-        clr_display()
-        if is_empty(stats) or stats['inventory']['Mysterious Shard'] == 0:
-            print(colored("You don't have anything to sell!  Come back when you have things to sell!", "red"))
-            time.sleep(1)
-        else:
-            print(colored("You can sell your ", "green") + colored("Mysterious Shards", "magenta", attrs=["bold"]) + colored(" for "+str(stats['multiplier'] * 1000)+" money each!", "green"))
-            time.sleep(1)
-            
+        upgrade = input("\n\n" + colored("Choose an Upgrade\n›› ", "cyan")).lower()
+
+        buy_item(upgrade, stats)
+    elif mode == "sell" or mode == 's':
+        util.clr_display()
+
+        print(colored("-- Inventory --\n", "green"))
+
+        if inv_empty(stats):
+            print("(Empty)", "grey")
+            input("\nPress ENTER to Continue... ")
+            return
+
+        while True:
+            util.clr_display()
+            print(colored("-- Inventory --\n", "green"))
+            for item in stats['inventory']:
+                print(f"{colored(item, 'blue')} | x{colored(stats['inventory'][stats])}")
+            sell = input(colored('\nWhat Item Would You Like To Sell?\n›› ', "green"))
+
+            if not sell in stats['inventory']:
+                continue
+
+            if not sell in stats['inventory']:
+                util.clr_display()
+                print(colored("You don't have any to sell!", "red"))
+                time.sleep(0.75)
+                continue
+
             while True:
+                util.clr_display()
+                print(colored("-- Inventory --\n", "green"))
                 try:
-                    sell_amount = int(input(colored("How many do you want to sell?\n›› ", "green")))
+                    sell_amt = int(input(colored("How many do you want to sell?\n›› ", "green")))
                     break
                 except ValueError:
-                    clr_display()
+                    util.clr_display()
                     print(colored("Please type a number!", "red"))
                     time.sleep(1)
-                    clr_display()
+            
+            if sell_amt == 0:
+                return
+            
+            
+            if int(sell_amt) > stats['inventory'][sell]:
+                util.clr_display()
+                print(colored("You don't have enough!", "red"))
+                time.sleep(0.75)
+                continue
 
-            if sell_amount == 0:
-                print(colored("Alright then, see you later!", "cyan"))
-                time.sleep(1)
-                clr_display()
-                return
-                
-            if stats['inventory']['Mysterious Shard'] >= sell_amount:
-                stats['inventory']['Mysterious Shard'] -= sell_amount
-                stats['moneyamount'] += (1000 * sell_amount) * stats['multiplier']
-                print(colored("Sold " + str(sell_amount) + " for " + str((1000 * sell_amount) * stats['multiplier']) + " money!", "green"))
-                time.sleep(2)
-                clr_display()
-                return
+            name = ""
+
+            if sell_amt > 1 and not (names[sell] == 0):
+                name = names[item]
             else:
-                print(colored("You don't have that many Mysterious Shards!  Check your inventory to see how many you have.", "red"))
-                time.sleep(1.25)
-                clr_display()
-                return
-    clr_display()
+                name = str(item).capitalize()
 
 
-if __name__ == '__main__':
-    print("It doesn't work like that!  Try running main.py to play Money Simulator!")
+            stats['moneyamount'] += prices[item] * stats['multiplier']
+            stats[sell] -= sell_amt
+
+            util.clr_display()
+
+            print(colored(f"You sold {str(int(sell_amt))} {name} for {prices[item]*stats['multiplier']}"))
+
+
+if __name__ == "__main__":
+    print("It doesn't work like that!  Try running launcher.py to play Money Simulator!")

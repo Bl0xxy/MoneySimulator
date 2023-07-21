@@ -1,13 +1,10 @@
 from termcolor import colored
 import time
-import os
-
-def clr_display():
-    os.system('cls' if os.name == 'nt' else 'clear')
+import util
 
 def main(stats):
-    clr_display()
-    if not stats['inventory']['Mysterious Shard'] > 24:
+    util.clr_display()
+    if not stats['inventory']['mystshard'] > 24:
         print(colored("You can't afford to craft any of your items!"))
         time.sleep(1.75)
         return
@@ -28,8 +25,8 @@ def main(stats):
             return
         
         elif craftingInput == "y":
-            stats['inventory']['Mysterious Shard'] -= 25
-            stats['inventory']['Booster'] += 1
+            stats['inventory']['mystshard'] -= 25
+            stats['inventory']['boost'] += 1
             stats['BoosterTotal'] += 1
             print(colored("You successfully crafted a booster!", "green"))
             time.sleep(1.75)
@@ -40,4 +37,4 @@ def main(stats):
             time.sleep(0.5)
 
 if __name__ == "__main__":
-    print("It doesn't work like that!  Try running main.py to play Money Simulator!")
+    print("It doesn't work like that!  Try running launcher.py to play Money Simulator!")

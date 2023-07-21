@@ -1,23 +1,16 @@
-from commands import money, inventory, shop, craft, info, save, restart
+from commands import money, inventory, craft, info, save, restart, shop
+from commands import quit
 from commands.powerups import booster
+import launcher
 import util
 
 def main(command, stats):
     # Gameplay Commands
-    if command in ["money", "m"]:
-        if (command == "m"):
-            if stats["cmd_shorten"]:
-                if money.main(stats) == "MysteriousShard":
-                    return "MysteriousShard"
-            else:
-                return
-        else:
-            if money.main(stats) == "MysteriousShard":
-                return "MysteriousShard"
+    if command == "money" or (command == "m" and stats['cmd_shorten']):
+        return money.main(stats)
         
     elif command == 'shop':
         shop.main(stats)
-        return "Normal"
     
     elif command == 'inventory':
         inventory.main(stats)
@@ -34,16 +27,16 @@ def main(command, stats):
         quit.main(stats)
     elif command in ['commands', 'help', 'info', 'cmds', 'cmd']:
         info.main()
-        return "Normal"
     elif command in ['save', "saveall", "save-all", "save game", "savegame", "gamesave", "game save"]:
         save.main(stats)
-        return "Normal"
     elif command in ['restart', "reset", "delete game save", "delete gamesave", "deletegamesave"]:
         restart.main()
-        return "Normal"
 
     # Developer Testing Commands - Disabled in Releases
     #
-    elif command == "devcheats":
-        stats['moneyamount'] += 1000000
+    #elif command == "devcheats":
+    #    stats['moneyamount'] += 1000000
     #
+
+if __name__ == "__main__":
+    launcher.main()
