@@ -3,7 +3,7 @@ import util
 import os
 import time
 
-names = {"mystshard": "Mysterious Shard", "bluegem": "Blue Gem", "wood": "Wood", "iron": "Iron", "boost":"Boost"}
+names = {"mystshard": "Mysterious Shard", "bluegem": "Blue Gem", "wood": "Wood", "iron": "Iron", "boost":"Boost", "tool": "Tool"}
 
 def clr_display():
     os.system("cls" if os.name == "nt" else "clear")
@@ -18,11 +18,23 @@ def inv_empty(stats): # Check Inventory
 def get_item(stats, results):
     item = ""
 
-    if results == "iron" or results == "wood":
+    if results == "Iron" or results == "Wood":
         item = colored(results.capitalize(), "white")
     elif results == "mystshard":
+        if stats['inventory']['tool'] < 1:
+            print(colored("You Found a ", "yellow") + colored("Mysterious Shard", "magenta", attrs=['bold']) + colored(" but it broke."))
+            time.sleep(2.25)
+            input("\nPress ENTER to Continue...")
+            return
+
         item = colored("a ", "yellow") + colored("Mysterious Shard", "magenta", attrs="bold") 
     elif results == "bluegem":
+        if stats['inventory']['tool'] < 2:
+            print(colored("You Found a ", "yellow") + colored("Blue Gem", "blue", attrs=['bold']) + colored(" but it broke."))
+            time.sleep(2.25)
+            input("\nPress ENTER to Continue...")
+            return 
+        
         item = colored("a ", "yellow") + colored("Blue Gem", "blue", attrs=["bold"])
 
     util.clr_display()
